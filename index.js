@@ -118,9 +118,10 @@ function performEvaluation(){
         displayOutput.value = tmpOutput;      // Output will be posted to the calculator display.
     } else {
         displayOutput.value = "--ERROR--"
+        resetScreenFlag = true;
     }
     clearAll();
-    resetScreenFlag = true;
+    first_number = displayOutput.value;
 }
 
 function validateKey(event){
