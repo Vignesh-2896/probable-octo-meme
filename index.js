@@ -1,18 +1,31 @@
 let operation = "";
-let decimal_enabled = false;
+let resetScreenFlag = false;        // Flag to check if display is to be reset.
+let decimal_enabled = false;        // Flag to check if decimal value has been included in current numberic value being input.
 let first_number = null;
 let second_number = null;
 let displayOutput = document.getElementById("calc_display_input"); // global variable to hold the value displayed on the screen.
 
 document.querySelectorAll(".operation").forEach(curOperation => {
-    curOperation.addEventListener("click", function(){
-        setOperation(curOperation.textContent);         // Set onclick operation for each Operation button with a parameter containing button's value.
+    curOperation.addEventListener("click", function(){          // Event to set operation for current calculation
+        setOperation(curOperation.textContent);         
     });
+    curOperation.addEventListener("mousedown", function(){      // Event to change background color of Operation button when mouse click is held on button
+        curOperation.style.backgroundColor = "#ffcc00";         
+    });
+    curOperation.addEventListener("mouseup", function(){        // Event to reset background color of Operation button when mouse click is released from button
+        curOperation.style.backgroundColor = "#ff9933"         
+    });    
 });
 
 document.querySelectorAll(".number").forEach(curNumber => {
-    curNumber.addEventListener("click", function(){      // Set onclick operation for each Number button with a parameter containing button's value.
+    curNumber.addEventListener("click", function(){      // Event to input numbers on to the screen
         setNumber(curNumber.textContent);
+    });
+    curNumber.addEventListener("mousedown", function(){      // Event to change background color of Number button when mouse click is held on button.
+        curNumber.style.backgroundColor = "#00ffcc";
+    });
+    curNumber.addEventListener("mouseup", function(){      // Event to reset background color of Number button when mouse click is released from button.
+        curNumber.style.backgroundColor = "#00cc99";
     });
 });
 
@@ -23,6 +36,7 @@ function setOperation(curOperation){
         case "AC":          // Clear all numeric values and operations.
             clearAll();
             displayOutput.value = "";
+            evaluationDone = false;
             break;
 
         case "back":        // Remove last entered digit
@@ -41,9 +55,15 @@ function setOperation(curOperation){
             break;
 
         default:
-            operation = curOperation;       // Value for global variable - operation, is set.
-            decimal_enabled = false;        // The flag (decimal_enabled) is set as false, so that decimal values can be input for second numeric value.
-            first_number = displayOutput.value;   // First numeric value is set with value displayed in calculator.
+            if(displayOutput.value != ""){
+                operation = curOperation;       // Value for global variable - operation, is set.
+                decimal_enabled = false;        // The flag (decimal_enabled) is set as false, so that decimal values can be input for second numeric value.
+                first_number = parseFloat(displayOutput.value);   // First numeric value is set with value displayed in calculator.
+                resetScreenFlag = true;
+            } else{
+                displayOutput.value = "Number First !"
+                resetScreenFlag = true;
+            }
     }
 }
 
@@ -51,20 +71,8 @@ function setNumber(currentNumber){
     if(displayOutput.value.length == 10){         // Maximum of 10 numbers are allowed.
         return;
     }
-    if(operation == ""){                    // Case where first numeric value is being input.
-        if(first_number == null){           // Case where first digit of the first numeric value is being input.
-            displayOutput.value = ""
-        }
-        displayOutput.value+= currentNumber;      // The number which is clicked/pressed on keyboard is added to calculator display.
-        alert(displayOutput.value);
-    } else{
-        if(first_number != null){           // Case where first numeric value has already been input.
-            if(second_number == null){      // Case where first digit of the second numeric value is being input.
-                displayOutput.value = ""
-            }
-            displayOutput.value+= currentNumber;  // The number which is clicked/pressed on keyboard is added to calculator display.
-        }
-    }
+    if(displayOutput.value == "0" || resetScreenFlag == true) resetScreen(); // Screen reset when zero is already present OR operator was just given OR an evaluation was done.
+    displayOutput.value += currentNumber;
 }
 
 function clearAll(){
@@ -81,7 +89,7 @@ function deleteNumber() {
 
 function performEvaluation(){
     let tmpOutput = 0;
-    second_number = displayOutput.value;          // Second numeric value is set with value displayed in calculator.
+    second_number = parseFloat(displayOutput.value);          // Second numeric value is set with value displayed in calculator.
     switch(operation){
         case "+":
             tmpOutput = first_number + second_number;
@@ -92,6 +100,9 @@ function performEvaluation(){
             break;
         
         case "/":
+            if(second_number == 0){
+                tmpOutput = "Infinity !"; break;
+            }
             tmpOutput = first_number / second_number;
             break;
 
@@ -103,10 +114,13 @@ function performEvaluation(){
             tmpOutput = first_number % second_number;
             break;
     }
-    if(tmpOutput.length <= 10){
+    if(tmpOutput.toString().length <= 10){
         displayOutput.value = tmpOutput;      // Output will be posted to the calculator display.
-        clearAll();
+    } else {
+        displayOutput.value = "--ERROR--"
     }
+    clearAll();
+    resetScreenFlag = true;
 }
 
 function validateKey(event){
@@ -121,12 +135,7 @@ function validateKey(event){
     } 
 }
 
-/*
-1. Decimal Numbers
-2. Max Numbers in Output
-3. Backspace
-4. Keyboard Input
-5. Multiplication
-6. Errors & Warnings
-7. Fix Colors
-*/
+function resetScreen(){
+    displayOutput.value = "";
+    resetScreenFlag = false;
+}

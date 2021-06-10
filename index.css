@@ -5,6 +5,7 @@
     margin-left:auto;
     margin-right:auto;
     padding:5px;
+    background-color: black;
 }
 
 #calc_display {
@@ -46,5 +47,9 @@
 }
 
 .operation {
-    color:orange;
+    background-color: #ff9933;
+}
+
+.number {
+    background-color: #00cc99;
 }
