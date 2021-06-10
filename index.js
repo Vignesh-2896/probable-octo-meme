@@ -56,6 +56,7 @@ function setOperation(curOperation){
 
         default:
             if(displayOutput.value != ""){
+                if(operation != "") performEvaluation(); // Evaluate current operands if expression contains more than 1 operator.
                 operation = curOperation;       // Value for global variable - operation, is set.
                 decimal_enabled = false;        // The flag (decimal_enabled) is set as false, so that decimal values can be input for second numeric value.
                 first_number = parseFloat(displayOutput.value);   // First numeric value is set with value displayed in calculator.
